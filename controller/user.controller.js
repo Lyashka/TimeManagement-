@@ -8,7 +8,12 @@ class UserController {
     }
 
     async getUser(req, res) {
-        const {email, password} = req.body
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        // res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE'); // If needed
+        // res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type'); // If needed
+        // res.setHeader('Access-Control-Allow-Credentials', true); // If needed
+
+        const {email, password} = req.query
 
         const user = await db.query(`SELECT DISTINCT * FROM users
         WHERE  users.email = $1 and users.password = $2 `, [email, password])
@@ -22,22 +27,30 @@ class UserController {
         JOIN users ON users.user_id = to_do_list.user_id
         WHERE  users.email = $1 and users.password = $2`, [email, password])
         
-        user.rows[0]['to_do_list'] = to_do_list.rows
-        
-        user.rows[0].to_do_list.forEach((e) => {
-            e['content'] = []
-        })
-
-        content.rows.forEach((item) => {
+    
+        if (user.rows[0]) {
+            user.rows[0]['to_do_list'] = to_do_list.rows;
             user.rows[0].to_do_list.forEach((e) => {
-                if (e.to_do_list_id == item.case_content_id) {
-                    e.content.push(item)
-                }
+                e['content'] = []
             })
-  
-        })
+            content.rows.forEach((item) => {
+                user.rows[0].to_do_list.forEach((e) => {
+                    if (e.to_do_list_id == item.case_content_id) {
+                        e.content.push(item)
+                    }
+                })
+      
+            })
+        }
+        
+        
+        
 
+        
+        // console.log(JSON.stringify(user.rows[0]));
         res.json(user.rows[0])
+
+        
     }
 
     async updateUser(req, res) {
