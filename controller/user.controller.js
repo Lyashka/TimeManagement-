@@ -18,7 +18,7 @@ class UserController {
         const user = await db.query(`SELECT DISTINCT * FROM users
         WHERE  users.email = $1 and users.password = $2 `, [email, password])
         
-        const to_do_list = await db.query(`SELECT DISTINCT to_do_list_id, date_start, list_name FROM users
+        const to_do_list = await db.query(`SELECT DISTINCT to_do_list_id, date_start, list_name, completed_status_to_do_list FROM users
         JOIN to_do_list ON users.user_id = to_do_list.user_id
         WHERE  users.email = $1 and users.password = $2`, [email, password])
 
@@ -66,15 +66,15 @@ class UserController {
     }
 
     async createToDoList(req, res) {
-        const {date_start, list_name, user_id} = req.body
-        const new_to_do_list = await db.query(`INSERT INTO to_do_list(date_start, list_name, user_id)
-        VALUES($1, $2, $3 )`, [date_start, list_name, user_id])
+        const {date_start, list_name, user_id, completed_status_to_do_list} = req.body
+        const new_to_do_list = await db.query(`INSERT INTO to_do_list(date_start, list_name, user_id, completed_status_to_do_list)
+        VALUES($1, $2, $3, $4 )`, [date_start, list_name, user_id, completed_status_to_do_list])
         res.json(new_to_do_list.rows[0])
     }
 
     async updateToDoList(req, res) {
-        const {date_start, list_name, user_id, to_do_list_id} = req.body
-        const user = await db.query(`UPDATE to_do_list set date_start = $1, list_name = $2, user_id = $3 where to_do_list_id = $4 RETURNING *`, [date_start, list_name, user_id, to_do_list_id])
+        const {date_start, list_name, user_id, to_do_list_id, completed_status_to_do_list} = req.body
+        const user = await db.query(`UPDATE to_do_list set date_start = $1, list_name = $2, user_id = $3, completed_status_to_do_list = $4 where to_do_list_id = $5 RETURNING *`, [date_start, list_name, user_id,completed_status_to_do_list, to_do_list_id])
         res.json(user.rows[0])
     }
  

@@ -6,7 +6,7 @@ const cors = require("cors")
 app.use(cors())
 app.use(express.json())
 app.use('/api', userRouter)
-
+process.env.TZ = 'UTC';
 
 
 app.listen(PORT, () => console.log(`server start on PORT ${PORT}...`))
